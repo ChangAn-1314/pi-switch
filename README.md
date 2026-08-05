@@ -1,353 +1,117 @@
-<div align="center">
+**1/**
+How long to crack a 256-bit Bitcoin wallet?
+The universe dies first. 🔒
 
-# pi-switch
+But what if the wallet's "randomness" was never random?
+We fully reproduced the ColdCard Yasmarang PRNG flaw and slashed the crack complexity from **2²⁵⁶ to 2⁴⁰**.
 
-[![Version](https://img.shields.io/badge/version-0.3.9-blue.svg)](https://github.com/user/pi-switch/releases)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)](https://github.com/user/pi-switch/releases)
-[![Built with Rust](https://img.shields.io/badge/built%20with-Rust-orange.svg)](https://www.rust-lang.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+**A 2²¹⁶× reduction.** 216 orders of magnitude, gone.
+The word "impossible" just got rewritten. 🧵👇
 
-**TUI + CLI dual-mode profile switcher for pi agent**
+**2/**
+📦 Two weapons, one mission: turn "un-enumerable" into "enumerated."
 
-Manage provider profiles and run a local model-name routing gateway with failover — via an interactive TUI or CLI.
+⚡ **Yasmarang-Streaming** — pure streaming engine. States in, addresses out, memory ≈ 0. 42 states/sec, 2× the Python original.
 
-[English](#) | [中文](README_ZH.md)
+💾 **Yasmarang-Cached** — the real game-breaker 👇
 
-</div>
+**3/**
+Why does Cached hit different?
 
----
+✅ **SQLite permanent cache** — every computed state banked forever; PBKDF2 (90% of compute) skipped outright
+✅ **Checkpoint & resume** — Ctrl-C whenever. 100k states today, continue tomorrow — siege the whole space, slice by slice
+✅ **Free retargeting** — new target list? The entire space is already waiting in the DB. Re-screen in seconds
+✅ **Cross-implementation** — Python and Go resume each other's databases, byte-identical fingerprints
 
-## 📸 Screenshots
+Compute once. Harvest forever. 🎯
 
-<div align="center">
-  <img src="assets/main.png" alt="pi-switch TUI" width="80%"/>
-</div>
+**4/**
+What can it enumerate? **Everything.** 🔍
 
----
+▪️ Boot time windows (SysTick + RTC dual time sources, any range)
+▪️ Device UID (single / range / batch / BCD grid / full space)
+▪️ UID unknown? Pad folding still covers the entire 2³²
+▪️ Mk4+ 32-bit reseed candidates
+▪️ PRNG stream offsets
+▪️ Precision tiers: smoke test → 20M states/sec
 
-## 📥 Installation
+Every state → 24-word mnemonic → 40+ addresses → target matching, **zero false negatives**.
+Every coin in the space is within range. 🎯
 
-```bash
-# npm (recommended)
-npm install -g @cokefenta/pi-switch
+**5/**
+Intel is the trigger. 🕵️
 
-# or via pi
-pi install npm:@cokefenta/pi-switch
-```
+🔗 **On-chain intel** — first TX time → pin the wallet's birth window
+🆔 **Device UID** — deletes the 2³² folded space in one stroke
+⏱️ **Boot time** — every 10× tighter window = 10× less compute
 
-**Build from source** (requires Node.js >= 20, Rust 1.80+):
+The tool enumerates all three: any window, any UID sweep, folding as fallback.
+**The sharper the intel, the closer 2⁴⁰ gets to "one afternoon."**
+No intel? The tool brute-lays the groundwork, grinding forward inch by inch.
 
-```bash
-git clone https://github.com/user/pi-switch.git
-cd pi-switch
-npm install
-npm run build:native
-node bin/pi-switch.js tui
-```
+**6/**
+This is what we proved:
 
-### System Compatibility
+Cryptographic walls are never toppled by brute force.
+They're opened from the inside — by **one faulty random number**. 🏰💥
 
-**Supported platforms:**
-- ✅ Windows (x64)
-- ✅ macOS (Intel & Apple Silicon)
-- ✅ Linux (x64) - glibc & musl
+A universe-scale problem → an afternoon's engineering.
+The tool is ready. The rest is just time. ⏳
 
-**Linux users:** This package includes prebuilt binaries for both glibc and musl systems. If you encounter a GLIBC version error, the package will automatically fallback to the musl binary which has broader compatibility.
+#COLDCARD #BitcoinHack #CryptoSecurity #SeedSecurity #HardwareWallet #selfcustody
+-------------2
+Token usage monitor CLI · Linux + Windows
 
-**Troubleshooting GLIBC errors:**
-```bash
-# If you see "GLIBC_X.XX not found", build from source:
-npm install -g @cokefenta/pi-switch --build-from-source
-```
+Static Go build · symbols stripped · zero egress · zero telemetry
+SHA256 verified · strace / Wireshark self-audit ready
 
----
+Tiers:
 
-## 🚀 Quick Start
+Streaming + README .............. 0.0033 USDT
+Cached    + README .............. 0.01 BTC
+Architecture source (Streaming | Cached) ... 0.018 BTC
 
-```bash
-pi-switch tui          # Interactive TUI (recommended)
-pi-switch webui start  # Browser UI at http://127.0.0.1:43110
-pi-switch doctor       # Run environment diagnostics
-```
+BTC: bc1qk3dvn48grr3dkmnfwlyux6vy5vqwdezts9lxgx
 
-> **Three ways, one core.** CLI, TUI, and WebUI are thin adapters over the same
-> Rust core. See [WEBUI_GUIDE.md](./WEBUI_GUIDE.md) for the WebUI and how to keep
-> the three interfaces in sync.
+EMAIL：gatherone@proton.me
 
-### Essential CLI Commands
-
-```bash
-# Provider management
-pi-switch provider add <name> [--preset <id>] [--api-key <key>]
-pi-switch provider list
-pi-switch provider show <name>
-pi-switch provider delete <name>
-pi-switch provider expose <name> <model-ids...>    # Expose models to pi agent
-pi-switch provider fetch-models <name>             # Fetch models from API
-
-# Proxy (gateway)
-pi-switch proxy failover <p1,p2,...>               # Same-model fallback chain
-pi-switch proxy start --daemon                     # Start proxy daemon
-pi-switch proxy status
-
-# WebUI (browser config)
-pi-switch webui start [--host <ip>] [--port <port>] [--daemon]
-pi-switch webui status
-pi-switch webui stop
-
-# Other
-pi-switch presets list                             # List built-in presets
-pi-switch config show                               # Display current config
-pi-switch config backups                            # List backup files
-pi-switch config export <passphrase>                # Encrypted export
-pi-switch config import <path> <passphrase>         # Encrypted import
-pi-switch stats                                     # View request statistics
-```
+Flow: pay -> DM @YOUR_X_HANDLE with tx screenshot -> delivery within 12h of confirmation
 
 ---
 
-## ✨ Features
-
-| Category | Highlights |
-|----------|------------|
-| 🔌 **Provider Management** | CRUD, duplicate, search/filter, model management, expose to pi agent |
-| 💡 **Built-in Presets** | OpenRouter, Anthropic, DeepSeek, SiliconFlow, OpenAI — add profiles instantly |
-| 🌉 **Model-Name Gateway** | Stateless routing by `profile/model` in the request body, SSE streaming, User-Agent disguise, request-body filtering, OpenAI ↔ Anthropic conversion, failover, circuit breaker |
-| 🖥️ **Interactive TUI** | ratatui-powered, Dracula theme, mouse support, vim keys (`hjkl`) |
-| 🌐 **Bilingual** | English / 中文, persisted to config, toggle in Settings |
-| 📊 **Usage Stats** | Per-provider, per-model request metrics & latency |
-| 💾 **Backup & Sync** | Auto-backup on mutation, AES-256-CBC encrypted export/import |
-| 🩺 **Diagnostics** | `doctor` command checks config, models.json, structure |
-
----
-
-## 🎯 Core Workflow
-
-### Gateway Routing & Failover
-
-```mermaid
-graph LR
-    subgraph Setup["⚙️ Setup"]
-        A[Add Provider] --> B[Configure Models]
-        B --> C[Expose to Pi]
-        C --> D[Set Failover Chain]
-    end
-
-    subgraph Runtime["🚀 Runtime"]
-        E["Request<br/>model: provider-a/gpt-5.4"] --> F{Resolve Route}
-        F --> G[Try provider-a]
-        G --> H{Success?}
-        H -->|✓| I[Response]
-        H -->|✗ 429/5xx| J[Try provider-b]
-        J --> K{Success?}
-        K -->|✓| I
-        K -->|✗| L[Circuit Breaker]
-        L --> M[60s Cooldown]
-        M --> N[Half-Open Probe]
-        N -->|✓| G
-        N -->|✗| M
-    end
-
-    Setup --> Runtime
-
-    style A fill:#50fa7b,stroke:#50fa7b,color:#282a36
-    style E fill:#8be9fd,stroke:#8be9fd,color:#282a36
-    style I fill:#50fa7b,stroke:#50fa7b,color:#282a36
-    style L fill:#ff5555,stroke:#ff5555,color:#f8f8f2
-```
-
-### Step by Step
-
-**1. Add a provider** (CLI or TUI)
-```bash
-pi-switch provider add provider-a --api openai-completions --base-url https://api.example.com/v1 \
-    --api-key '$API_KEY' --models gpt-5.4,claude-sonnet-4-5
-```
-In TUI: `Profiles → a → fill form → Ctrl+S`
-
-**2. Expose models to pi agent** — choose which models appear in `~/.pi/agent/models.json`
-```bash
-pi-switch provider expose provider-a gpt-5.4
-```
-In TUI: `Profiles → select provider → x`
-
-**3. Start the proxy** — it writes a single `pi-switch` gateway provider to pi
-```bash
-pi-switch proxy failover provider-b,provider-c          # optional same-model fallback
-pi-switch proxy start --daemon
-```
-
-**4. Use in pi** — select the `pi-switch` provider, then pick a `profile/model` like `provider-a/gpt-5.4`
-
-### How Gateway Routing Works
-
-Requests are routed by the model name in the request body — no out-of-band state, no "current target":
-
-- **Model-name routing** — `"model": "provider-a/gpt-5.4"` resolves to profile `provider-a`, real model `gpt-5.4`; the proxy rewrites the body before forwarding upstream
-- **Single gateway provider** — pi sees one `pi-switch` provider advertising every exposed model as `profile/realModelId`; switching model in pi = sending a different model string = instant routing change
-- **Automatic failover** — same-model fallback across the configured chain on 429/5xx errors or network failures
-- **Circuit breaker** — after 3 consecutive failures, provider enters 60s cooldown; auto-recovery on half-open probe success
-- **Streaming (SSE)** — same-format requests (openai→openai, anthropic→anthropic) stream token-by-token; upstream response headers (Content-Type, etc.) are preserved
-- **OpenAI ↔ Anthropic** — transparently converts between chat completions and messages APIs
-- **User-Agent disguise** — built-in presets (Claude Code / Codex / Gemini) send the matching client's real User-Agent (and headers like `anthropic-beta`) to pass upstream client checks; settable globally or per-profile
-
-> **Known limitation** — the OpenAI ↔ Anthropic **conversion** path can't stream: it parses the full JSON to convert formats. If pi sends `stream: true` but the model routes to a cross-format upstream (OpenAI request → Anthropic upstream, or vice-versa), the reply comes back as a single non-streamed response. Same-format routes stream normally.
-
----
-
-## 🏗️ Architecture
-
-```
-pi-switch/
-├── bin/pi-switch.js         # CLI entry point
-├── index.js                 # ESM wrapper for native addon
-├── pi-switch-native.cjs     # NAPI loader (auto platform detection)
-├── src-rust/                # Rust native core (napi-rs)
-│   ├── lib.rs               # NAPI function exports
-│   ├── config.rs            # Config load/save, types
-│   ├── ops.rs               # Core operations
-│   ├── presets.rs           # Built-in provider presets
-│   ├── proxy.rs             # Proxy server (gateway routing, failover, circuit breaker)
-│   ├── daemon.rs            # Daemon lifecycle
-│   ├── stats.rs             # Request log aggregation
-│   ├── sync.rs              # Encrypted export/import
-│   └── tui/                 # Interactive terminal UI (ratatui)
-│       ├── app.rs           # State machine + key handler
-│       ├── form.rs          # Provider form state
-│       ├── i18n.rs          # Bilingual (EN/ZH)
-│       └── ui/              # Rendering (chrome, pages, overlays)
-├── src/                     # JavaScript layer (pi extension support)
-├── extensions/index.ts      # Pi agent extension (/piswitch)
-└── Cargo.toml
-```
-
-**Config files:**
-- `~/.pi-switch/config.json` — profiles, proxy settings, failover chain
-- `~/.pi-switch/backups/` — timestamped auto-backups on every mutation
-- `~/.pi/agent/models.json` — pi's provider registry (pi-switch writes a single gateway provider)
-
----
-
-## ❓ FAQ
-
-<details>
-<summary><b>How do I switch models in pi?</b></summary>
-<br>
-
-In pi, open `/model` and pick any advertised `profile/model` (e.g. `provider-a/gpt-5.4`). The proxy routes by the model name in each request — no extra step needed.
-
-To add more models, expose them in TUI (`Profiles → select provider → x`) or via CLI:
-```bash
-pi-switch provider expose <name> <model-id>...
-```
-
-</details>
-
-<details>
-<summary><b>How do I set up failover?</b></summary>
-<br>
-
-In TUI: `Settings → Failover` → `Enter` → enter comma-separated profile names → `Enter`.
-Or via CLI:
-```bash
-pi-switch proxy failover provider-b,provider-c
-```
-
-Profiles in the failover chain that expose the same model are tried in order when the primary fails.
-
-</details>
-
-<details>
-<summary><b>What does the [proxy] badge mean?</b></summary>
-
-<br>
-
-The `[proxy]` badge indicates this profile is a meta-profile (with `"proxy": true`). Proxy profiles are used to register a pi provider that points to the local gateway. They are excluded from upstream routing.
-
-In the current gateway mode, proxy profiles are typically not needed — the proxy automatically writes a single `pi-switch` gateway provider to pi's models.json on startup.
-
-</details>
-
-<details>
-<summary><b>How does gateway routing work?</b></summary>
-
-<br>
-
-The proxy advertises every exposed model as `profile/realModelId` under a single `pi-switch` provider. When pi sends a request with `"model": "provider-a/gpt-5.4"`, the proxy:
-
-1. Splits on the first `/` — profile `provider-a`, real model `gpt-5.4`
-2. Routes to the `provider-a` profile's upstream, rewriting `body.model` to `gpt-5.4`
-3. On failure (429/5xx), tries the failover chain for any other profile exposing `gpt-5.4`
-
-```bash
-# 1. Expose models (per profile)
-pi-switch provider expose provider-a gpt-5.4
-pi-switch provider expose provider-b gpt-5.4
-
-# 2. Set failover chain (optional)
-pi-switch proxy failover provider-b
-
-# 3. Start proxy daemon
-pi-switch proxy start --daemon
-```
-
-In pi, select the `pi-switch` provider, then `provider-a/gpt-5.4`. The model name in each request determines the route — no "target" to manage.
-
-</details>
-
-<details>
-<summary><b>How does User-Agent disguise work?</b></summary>
-<br>
-
-Some upstream channels only accept requests from whitelisted clients (checking the User-Agent name prefix). pi-switch has three built-in presets that send the matching client's real identity:
-
-| Preset | User-Agent | Extra headers |
-|--------|------------|---------------|
-| Claude Code | `claude-cli/2.1.161 (external, cli)` | `anthropic-version`, `anthropic-beta` |
-| Codex | `codex_cli_rs/0.1.0` | — |
-| Gemini | `gemini-cli/0.1.5` | `x-goog-api-client` |
-
-- **Global**: `Settings → User-Agent`, cycle with `←/→`.
-- **Per-profile**: in a profile's detail view press `u` to cycle; a per-profile value overrides the global one. Useful when only some upstreams enforce a UA whitelist.
-
-Note: this only passes checks that look at the client name. It does not fabricate deeper per-request tokens (turn state, session ids), which strict first-party endpoints validate.
-
-</details>
-
-<details>
-<summary><b>Where is my data stored?</b></summary>
-<br>
-
-Everything under `~/.pi-switch/`. Pi's own registry is `~/.pi/agent/models.json`. No data leaves your machine.
-
-</details>
-
----
-
-## 🛠️ Development
-
-```bash
-npm run build:native:debug     # Build Rust addon (debug)
-npm run build:native           # Build Rust addon (release)
-cargo build                    # Rust-only build
-cargo clippy                   # Lint
-cargo fmt                      # Format
-cargo test --release --lib     # Run unit tests
-```
-
-**Note:** Stop the TUI/daemon before `npm run build:native` to avoid file-lock errors on Windows.
-
----
-
-## 🙏 Acknowledgments
-
-- **[cc-switch](https://github.com/farion1231/cc-switch)** — the original TUI-based profile switcher for Claude Code, which pioneered the interactive terminal UI pattern and proxy failover design
-- **[cc-switch-cli](https://github.com/SaladDay/cc-switch-cli)** — the CLI counterpart, providing a clean command-line interface for provider management
-
-Thanks also to the **[LINUX DO](https://linux.do/)** community for the discussions that sparked this project.
-
----
-
-## 📜 License
-
-MIT
+[Thread 1/3]
+Why static Go?
+Single-binary deploy, zero runtime deps.
+Symbols stripped - reversing cost ~= rewriting.
+Want to audit? Buy the source tier. Source = docs.
+
+[Thread 2/3]
+Zero egress means: no network calls except the LLM API you explicitly invoke.
+No telemetry, no data collection.
+Verify it yourself with tcpdump / Wireshark in 2 minutes.
+
+[Thread 3/3]
+Delivery package:
+• Linux + Windows binaries
+• README deployment notes
+• SHA256 checksums
+Source tier adds full architecture annotations and reproducible build scripts.
+
+#COLDCARD #BitcoinHack #CryptoSecurity #SeedSecurity #HardwareWallet #selfcustody   
+                                                                                             LION626GROUP.
+
+BY THE WAY:
+Gatherone deadline has passed. We have not received payment, and we are done waiting.We are releasing your data.
+  gatherone DB: the "core ledger" of a cross-platform ad business.
+
+  44GB hosting $721M+ in cumulative ad spend across Meta/Google/TikTok — 14.97M placement rows, 114K accounts, 790
+  clients, 83 countries.
+
+  Gaming vertical leads at $226M. Top client JOYFUL alone: $114M.
+NOW everybody can download and watch。
+AND WE BUILD A ENUMTOOLS OF COLDCARD ENUMTOOLS
+
+https://github.com/yinpengmaoca-hue/COLDCARD_ENUM_TOOLS-gatherone-backup/releases/tag/v20260720
+48001c41a44cdd6fcd8d78ce484d5fdf5c578841e10fb223e4ece982b10f4b61 *gatherone_full_20260720_181615.sql.gz.part_01
+3924cc7ac46528c718c1f74c259796d308c3729af0024a2675b9b19f671e0a63 *gatherone_full_20260720_181615.sql.gz.part_02
+ff37a62de9388ecd63488128b869d6cfa99e4802178f6cfb2e6f4c78b074c079 *gatherone_full_20260720_181615.sql.gz.part_03
